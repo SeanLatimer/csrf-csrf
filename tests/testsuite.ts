@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { assert, expect } from "chai";
-import { doubleCsrf, DoubleCsrfConfigOptions } from "../index.js";
+import type {
+  DoubleCsrfConfigOptions,
+  DoubleCsrfUtilities,
+} from "../src/index.js";
 import { Request, Response } from "express";
 import cookieParser, { signedCookie } from "cookie-parser";
 import { parse } from "cookie";
@@ -11,6 +14,8 @@ import { sign } from "cookie-signature";
 
 type CreateTestsuite = (
   name: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  doubleCsrf: (opts: any) => DoubleCsrfUtilities,
   doubleCsrfOptions: DoubleCsrfConfigOptions
 ) => void;
 
@@ -37,7 +42,11 @@ const cookieParserMiddleware = cookieParser(COOKIE_SECRET);
  * @param name - The name of the test suite.
  * @param doubleCsrfOptions - The DoubleCsrfConfig.
  */
-export const createTestSuite: CreateTestsuite = (name, doubleCsrfOptions) => {
+export const createTestSuite: CreateTestsuite = (
+  name,
+  doubleCsrf,
+  doubleCsrfOptions
+) => {
   describe(name, () => {
     // Initialise the package with the passed in test suite settings and a mock secret
     const {
